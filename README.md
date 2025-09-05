@@ -12,7 +12,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  inner_shadow:
+  auto_image_sequencer:
     git:
       url: https://github.com/yabzec/auto_image_sequencer.git
       ref: main
