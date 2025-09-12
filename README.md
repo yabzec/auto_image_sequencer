@@ -1,6 +1,6 @@
 # auto_image_sequencer
 
-Animate and control a sequence of images
+Flutter plugin for animate and control a sequence of images
 
 ## Features
 
