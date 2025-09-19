@@ -12,10 +12,12 @@ class AutoImageSequencer extends StatefulWidget {
     required this.imageUrls,
     this.onCreate,
     this.speed = 200,
+    this.loadingBuilder,
   });
 
   final List<String> imageUrls;
   final int speed;
+  final Widget Function(double status)? loadingBuilder;
   final void Function(AutoImageSequencerController)? onCreate;
 
   @override
@@ -138,15 +140,19 @@ class _AutoImageSequencerState extends State<AutoImageSequencer> {
       return SizedBox(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.width,
-        child: Center(child: CircularProgressIndicator()),
+        child: Center(
+          child: widget.loadingBuilder != null
+              ? widget.loadingBuilder!.call(controller.downloadStatus)
+              : CircularProgressIndicator(),
+        ),
       );
     }
 
     if (_error) {
-      return Center(
+      return const Center(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text("Error", style: const TextStyle(color: Colors.red)),
+          padding: EdgeInsets.all(16.0),
+          child: Text("Error", style: TextStyle(color: Colors.red)),
         ),
       );
     }
@@ -155,7 +161,7 @@ class _AutoImageSequencerState extends State<AutoImageSequencer> {
       aspectRatio: _images[_currentIndex].width / _images[_currentIndex].height,
       child: CustomPaint(
         painter: _ImagePainter(image: _images[_currentIndex]),
-        child: SizedBox(),
+        child: const SizedBox(),
       ),
     );
   }
