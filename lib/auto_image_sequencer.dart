@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:ui' as ui;
-import 'package:http/http.dart' as http;
 
 import 'package:auto_image_sequencer/auto_image_sequencer_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class AutoImageSequencer extends StatefulWidget {
   const AutoImageSequencer({
@@ -58,11 +58,11 @@ class _AutoImageSequencerState extends State<AutoImageSequencer> {
       _images = await Future.wait(imageFutures);
 
       if (_images.isEmpty) {
-        throw Exception("Nessuna immagine è stata caricata.");
+        throw Exception("No image loaded.");
       }
     } catch (e) {
       if (kDebugMode) {
-        print("Errore nel caricamento delle immagini: ${e.toString()}");
+        print("Error during image loading: ${e.toString()}");
       }
       if (mounted) {
         setState(() {
@@ -83,7 +83,7 @@ class _AutoImageSequencerState extends State<AutoImageSequencer> {
     final response = await http.get(Uri.parse(url), headers: _browserHeaders);
 
     if (response.statusCode != 200) {
-      throw Exception('Errore: ${response.statusCode}\n${response.body}');
+      throw Exception('Error: ${response.statusCode}\n${response.body}');
     }
 
     final codec = await ui.instantiateImageCodec(response.bodyBytes);
