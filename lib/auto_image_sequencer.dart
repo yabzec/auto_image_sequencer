@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:ui' as ui;
+import 'dart:ui';
 
-import 'package:auto_image_sequencer/auto_image_sequencer_controller.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Image;
 import 'package:http/http.dart' as http;
 
 class AutoImageSequencer extends StatefulWidget {
@@ -39,8 +39,14 @@ class _AutoImageSequencerState extends State<AutoImageSequencer> {
   @override
   void initState() {
     super.initState();
+    controller = AutoImageSequencerController._(
+      _play,
+      _pause,
+      _reset,
+      _jumpTo,
+      _images.length,
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadAndDecodeImages());
-    controller = AutoImageSequencerController(_play, _pause, _reset, _jumpTo);
   }
 
   @override
@@ -88,6 +94,7 @@ class _AutoImageSequencerState extends State<AutoImageSequencer> {
 
     final codec = await ui.instantiateImageCodec(response.bodyBytes);
     final frame = await codec.getNextFrame();
+    controller._increaseDownloadedImageCount();
     return frame.image;
   }
 
@@ -104,7 +111,7 @@ class _AutoImageSequencerState extends State<AutoImageSequencer> {
       setState(() {
         _currentIndex = (_currentIndex + 1) % _images.length;
       });
-      controller.notifyImageChange?.call(_currentIndex, _images[_currentIndex]);
+      controller._onImageChange?.call(_currentIndex, _images[_currentIndex]);
     });
   }
 
@@ -172,5 +179,64 @@ class _ImagePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _ImagePainter oldDelegate) {
     return image != oldDelegate.image;
+  }
+}
+
+class AutoImageSequencerController extends ChangeNotifier {
+  void Function(int index, Image image)? _onImageChange;
+  bool isPlaying = false;
+  final void Function() _play;
+  final void Function() _pause;
+  final void Function() _stop;
+  void Function(int) jumpTo;
+  final int _imageCount;
+  int _downloadedImageCount = 0;
+
+  AutoImageSequencerController._(
+    this._play,
+    this._pause,
+    this._stop,
+    this.jumpTo,
+    this._imageCount,
+  );
+
+  get downloadStatus => _downloadedImageCount / _imageCount;
+
+  void _increaseDownloadedImageCount() {
+    _downloadedImageCount++;
+    notifyListeners();
+  }
+
+  void toggle() {
+    if (isPlaying) {
+      return pause();
+    }
+
+    play();
+  }
+
+  void play() {
+    if (isPlaying) return;
+    _play();
+    isPlaying = true;
+    notifyListeners();
+  }
+
+  void pause() {
+    if (!isPlaying) return;
+    _pause();
+    isPlaying = false;
+    notifyListeners();
+  }
+
+  void stop() {
+    if (isPlaying) {
+      _pause();
+    }
+    _stop();
+  }
+
+  set onImageChange(void Function(int index, Image image)? value) {
+    _onImageChange = value;
   }
 }
