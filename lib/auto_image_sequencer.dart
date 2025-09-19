@@ -46,7 +46,7 @@ class _AutoImageSequencerState extends State<AutoImageSequencer> {
       _pause,
       _reset,
       _jumpTo,
-      _images.length,
+      widget.imageUrls.length,
     );
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadAndDecodeImages());
   }
