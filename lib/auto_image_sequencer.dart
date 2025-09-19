@@ -142,8 +142,12 @@ class _AutoImageSequencerState extends State<AutoImageSequencer> {
         height: MediaQuery.of(context).size.width,
         child: Center(
           child: widget.loadingBuilder != null
-              ? widget.loadingBuilder!.call(controller.downloadStatus)
-              : CircularProgressIndicator(),
+              ? ListenableBuilder(
+                  listenable: controller,
+                  builder: (_, __) =>
+                      widget.loadingBuilder!.call(controller.downloadStatus),
+                )
+              : const CircularProgressIndicator(),
         ),
       );
     }
