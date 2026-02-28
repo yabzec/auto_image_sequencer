@@ -44,3 +44,6 @@ AutoImageSequencer(
     speed = 200 //in milliseconds
 )
 ```
+
+## Tips
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/I3I61V3CIV)
